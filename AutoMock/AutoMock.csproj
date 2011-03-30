@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AutoMocker.cs" />
     <Compile Include="IDependencyProvider.cs" />
+    <Compile Include="MoqDependencyProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
