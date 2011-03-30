@@ -7,24 +7,16 @@ using Moq;
 namespace AutoMock
 {
 	/// <summary>
-	/// A specialized <see cref="AutoMocker"/> that injects <see cref="Moq"/> objects
+	/// A specialized <see cref="AutoMocker{T}"/> that injects <see cref="Moq"/> objects
 	/// into the instance to create.
 	/// </summary>
-	public class MoqAutoMocker : AutoMocker
+	public class MoqAutoMocker : AutoMocker<MoqDependencyProvider>
 	{
-	    private readonly MoqDependencyProvider _dependencyProvider;
-
-        /// <summary>
+	    /// <summary>
         /// Creates a new <see cref="MoqAutoMocker"/> instance.
         /// </summary>
-	    public MoqAutoMocker() : this(new MoqDependencyProvider())
+	    public MoqAutoMocker() : base(new MoqDependencyProvider())
 		{ }
-
-        private MoqAutoMocker(MoqDependencyProvider dependencyProvider)
-            : base(dependencyProvider)
-        {
-            _dependencyProvider = dependencyProvider;
-        }
 
         /// <summary>
         /// Finds a previously created instance; or creates a new instance of
@@ -32,7 +24,7 @@ namespace AutoMock
         /// </summary>
         public Mock<T> GetMock<T>() where T : class
 	    {
-            return _dependencyProvider.GetMock<T>();
+            return DependencyProvider.GetMock<T>();
 	    }
 	}
 }

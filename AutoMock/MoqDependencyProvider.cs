@@ -7,12 +7,12 @@ using Moq;
 namespace AutoMock
 {
     /// <summary>
-	/// A specialized <see cref="IDependencyProvider"/> that works by returning
+    /// A specialized <see cref="IDependencyProvider"/> that works by returning
     /// <see cref="Mock"/> objects.
     /// </summary>
     public class MoqDependencyProvider : IDependencyProvider
     {
-        private readonly Dictionary<Type, Mock> _cache = new Dictionary<Type,Mock>();
+        private readonly Dictionary<Type, Mock> _cache = new Dictionary<Type, Mock>();
 
         /// <summary>
         /// Resolves an instance of <typeparamref name="T"/>

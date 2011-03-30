@@ -9,20 +9,22 @@ namespace AutoMock
     /// configure this in unit tests, and manually adjusting tests when dependencies for the
     /// SUT changes.
     /// </summary>
-    public class AutoMocker
+    public class AutoMocker<TDependencyProvider> where TDependencyProvider : IDependencyProvider
     {
-        private readonly IDependencyProvider _dependencyProvider;
+        private readonly TDependencyProvider _dependencyProvider;
 
         /// <summary>
-        /// Creates a new <see cref="AutoMocker"/> instance.
+        /// Creates a new <see cref="AutoMocker{T}"/> instance.
         /// </summary>
         /// <param name="dependencyProvider">
         /// An <see cref="IDependencyProvider"/> to be used for instantiating constructor dependencies.
         /// </param>
-        public AutoMocker(IDependencyProvider dependencyProvider)
+        public AutoMocker(TDependencyProvider dependencyProvider)
         {
             _dependencyProvider = dependencyProvider;
         }
+
+        internal TDependencyProvider DependencyProvider { get { return _dependencyProvider; } }
 
         /// <summary>
         /// Creates an instance of the class <typeparamref name="T"/>.
