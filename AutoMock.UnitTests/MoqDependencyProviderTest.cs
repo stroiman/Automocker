@@ -7,19 +7,19 @@ namespace AutoMock.UnitTests
     [TestFixture]
     public class MoqDependencyProviderTest
     {
-        private MoqDependencyProvider _repository;
+        private MoqDependencyProvider _moqProvider;
 
         [SetUp]
         public void Setup()
         {
-            _repository = new MoqDependencyProvider();
+            _moqProvider = new MoqDependencyProvider();
         }
 
         [Test]
         public void ResolvingAnInterfaceShouldReturnAMoq()
         {
             // Exercise
-            var mockedInstance = _repository.GetInstance<ISimpleDependency>();
+            var mockedInstance = _moqProvider.GetInstance<ISimpleDependency>();
 
             // Verify
             var mock = Mock.Get(mockedInstance);
@@ -30,10 +30,10 @@ namespace AutoMock.UnitTests
         public void ResolvingAfterGetMockShouldReturnSameInstance()
         {
             // Setup
-            var mock = _repository.GetMock<ISimpleDependency>();
+            var mock = _moqProvider.GetMock<ISimpleDependency>();
 
             // Exercise
-            var mockedInstance = _repository.GetInstance<ISimpleDependency>();
+            var mockedInstance = _moqProvider.GetInstance<ISimpleDependency>();
 
             // Verify
             Assert.That(mock.Object, Is.SameAs(mockedInstance));
@@ -43,10 +43,10 @@ namespace AutoMock.UnitTests
         public void GetMockAfterResolvingShouldReturnSameInstance()
         {
             // Setup
-            var mockedInstance = _repository.GetInstance<ISimpleDependency>();
+            var mockedInstance = _moqProvider.GetInstance<ISimpleDependency>();
 
             // Exercise
-            var mock = _repository.GetMock<ISimpleDependency>();
+            var mock = _moqProvider.GetMock<ISimpleDependency>();
 
             // Verify
             Assert.That(mockedInstance, Is.SameAs(mock.Object));
@@ -56,7 +56,7 @@ namespace AutoMock.UnitTests
         public void CreateInstanceWithNestedDependencyShouldAutomaticallyMockDependency()
         {
             // Exercise
-            var instance = _repository.GetInstance<IInterfaceWithDependency>();
+            var instance = _moqProvider.GetInstance<IInterfaceWithDependency>();
 
             // Verify
             Assert.That(instance.Dependency, Is.Not.Null);
@@ -66,10 +66,10 @@ namespace AutoMock.UnitTests
         public void GetMockBeforeCreateInstanceWithNestedDependencyShouldReuseSameMock()
         {
             // Setup
-            var mock = _repository.GetMock<ISimpleDependency>();
+            var mock = _moqProvider.GetMock<ISimpleDependency>();
 
             // Exercise
-            var instance = _repository.GetInstance<IInterfaceWithDependency>();
+            var instance = _moqProvider.GetInstance<IInterfaceWithDependency>();
 
             // Veridy
             Assert.That(instance.Dependency, Is.SameAs(mock.Object));
@@ -78,7 +78,7 @@ namespace AutoMock.UnitTests
         [Test, ExpectedException(typeof(CircularDependencyException))]
         public void ResolvingInterfaceWithCircularDependencyShouldThrowDependencyReferenceException()
         {
-            _repository.GetInstance<IInterfaceWithCircularDependency>();
+            _moqProvider.GetInstance<IInterfaceWithCircularDependency>();
         }
     }
 }
