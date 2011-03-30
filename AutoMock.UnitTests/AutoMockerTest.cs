@@ -8,12 +8,12 @@ namespace AutoMock.UnitTests
     public class AutoMockerTest
     {
         private AutoMocker _automocker;
-        private Mock<IDependencyRepository> _dependencyRepositoryMock;
+        private Mock<IDependencyProvider> _dependencyRepositoryMock;
 
         [SetUp]
         public void Setup()
         {
-            _dependencyRepositoryMock = new Mock<IDependencyRepository>();
+            _dependencyRepositoryMock = new Mock<IDependencyProvider>();
             _automocker = new AutoMocker(_dependencyRepositoryMock.Object);
         }
 

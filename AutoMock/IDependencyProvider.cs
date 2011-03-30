@@ -4,7 +4,7 @@
     /// This interface is responsible for managing and creating dependencies for a component to
     /// be created by <see cref="AutoMocker"/>
     /// </summary>
-    public interface IDependencyRepository
+    public interface IDependencyProvider
     {
         /// <summary>
         /// Resolves an instance of <typeparamref name="T"/>

@@ -11,17 +11,17 @@ namespace AutoMock
     /// </summary>
     public class AutoMocker
     {
-        private readonly IDependencyRepository _dependencyRepository;
+        private readonly IDependencyProvider _dependencyProvider;
 
         /// <summary>
         /// Creates a new <see cref="AutoMocker"/> instance.
         /// </summary>
-        /// <param name="dependencyRepository">
-        /// An <see cref="IDependencyRepository"/> to be used for instantiating constructor dependencies.
+        /// <param name="dependencyProvider">
+        /// An <see cref="IDependencyProvider"/> to be used for instantiating constructor dependencies.
         /// </param>
-        public AutoMocker(IDependencyRepository dependencyRepository)
+        public AutoMocker(IDependencyProvider dependencyProvider)
         {
-            _dependencyRepository = dependencyRepository;
+            _dependencyProvider = dependencyProvider;
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace AutoMock
 
         private object GetArgument(Type argumentType)
         {
-            var getInstanceMethod = typeof(IDependencyRepository).GetMethod("GetInstance");
+            var getInstanceMethod = typeof(IDependencyProvider).GetMethod("GetInstance");
             var genericMethod = getInstanceMethod.MakeGenericMethod(argumentType);
-            return genericMethod.Invoke(_dependencyRepository, new object[0]);
+            return genericMethod.Invoke(_dependencyProvider, new object[0]);
         }
     }
 }
