@@ -31,17 +31,28 @@ namespace AutoMock
         /// </summary>
         public T GetInstance<T>()
         {
-            var type = typeof(T);
+            return (T)GetInstance(typeof(T));
+        }
+
+        private object GetInstance(Type type)
+        {
             var constructor = type.GetConstructors().First();
             var parameters = constructor.GetParameters().Select(x => GetArgument(x.ParameterType)).ToArray();
-            return (T)constructor.Invoke(parameters);
+            return constructor.Invoke(parameters);            
         }
 
         private object GetArgument(Type argumentType)
         {
-            var getInstanceMethod = typeof(IDependencyProvider).GetMethod("GetInstance");
-            var genericMethod = getInstanceMethod.MakeGenericMethod(argumentType);
-            return genericMethod.Invoke(_dependencyProvider, new object[0]);
+            if (argumentType.IsInterface)
+            {
+                var getInstanceMethod = typeof (IDependencyProvider).GetMethod("GetInstance");
+                var genericMethod = getInstanceMethod.MakeGenericMethod(argumentType);
+                return genericMethod.Invoke(_dependencyProvider, new object[0]);
+            }
+            else
+            {
+                return GetInstance(argumentType);
+            }
         }
     }
 }

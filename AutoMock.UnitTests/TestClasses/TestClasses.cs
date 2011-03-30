@@ -10,4 +10,11 @@
 
         public ClassWithSimpleDependency(ISimpleDependency dependency) { Dependency = dependency; }
     }
+
+    public class ClassWithClassDependency
+    {
+        public ClassWithSimpleDependency Dependency { get; private set; }
+
+        public ClassWithClassDependency(ClassWithSimpleDependency dependency) { Dependency = dependency; }
+    }
 }

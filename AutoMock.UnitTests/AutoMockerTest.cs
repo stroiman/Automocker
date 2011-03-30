@@ -37,5 +37,16 @@ namespace AutoMock.UnitTests
             // Verify
             Assert.That(instance.Dependency, Is.SameAs(dependency));
         }
+
+        [Test]
+        public void CreateInstanceWithSpecificClassDependency()
+        {
+            // Exercise
+            var instance = _automocker.GetInstance<ClassWithClassDependency>();
+
+            // Verify
+            Assert.That(instance, Is.Not.Null);
+            Assert.That(instance.Dependency, Is.Not.Null);
+        }
     }
 }
