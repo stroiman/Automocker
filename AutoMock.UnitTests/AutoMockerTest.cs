@@ -48,5 +48,15 @@ namespace AutoMock.UnitTests
             Assert.That(instance, Is.Not.Null);
             Assert.That(instance.Dependency, Is.Not.Null);
         }
+
+        [Test]
+        public void CreatingClassWithMultipleConstructorsShouldUseGreedyConstructor()
+        {
+            // Exercise
+            var instance = _automocker.GetInstance<ClassWithMultipleConstructors>();
+
+            // Verify
+            Assert.That(instance.WasConstructedUsingGreedyConstructor);
+        }
     }
 }

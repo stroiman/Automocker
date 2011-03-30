@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMock
 {
@@ -36,9 +37,10 @@ namespace AutoMock
 
         private object GetInstance(Type type)
         {
-            var constructor = type.GetConstructors().First();
-            var parameters = constructor.GetParameters().Select(x => GetArgument(x.ParameterType)).ToArray();
-            return constructor.Invoke(parameters);            
+            var constructors = type.GetConstructors();
+            var greedyConstructor = constructors.OrderBy(x => x.GetParameters().Count()).Last();
+            var parameters = greedyConstructor.GetParameters().Select(x => GetArgument(x.ParameterType)).ToArray();
+            return greedyConstructor.Invoke(parameters);            
         }
 
         private object GetArgument(Type argumentType)
