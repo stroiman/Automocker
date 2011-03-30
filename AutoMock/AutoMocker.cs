@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace AutoMock
 {
+    public class CircularDependencyException : Exception {}
+
     /// <summary>
     /// This class responsible for objects to be used in unit tests, but with the dependencies of
     /// these objects automatically replaced by mock objects, reducing the need to manually
@@ -13,7 +16,7 @@ namespace AutoMock
     public class AutoMocker<TDependencyProvider> where TDependencyProvider : IDependencyProvider
     {
         private readonly TDependencyProvider _dependencyProvider;
-
+        
         /// <summary>
         /// Creates a new <see cref="AutoMocker{T}"/> instance.
         /// </summary>
@@ -32,18 +35,22 @@ namespace AutoMock
         /// </summary>
         public T GetInstance<T>()
         {
-            return (T)GetInstance(typeof(T));
+            return (T)GetInstance(typeof(T), new Stack<Type>());
         }
 
-        private object GetInstance(Type type)
+        private object GetInstance(Type type, Stack<Type> buildStack)
         {
+            if (buildStack.Contains(type))
+                throw new CircularDependencyException();
+            buildStack.Push(type);
             var constructors = type.GetConstructors();
             var greedyConstructor = constructors.OrderBy(x => x.GetParameters().Count()).Last();
-            var parameters = greedyConstructor.GetParameters().Select(x => GetArgument(x.ParameterType)).ToArray();
+            var parameters = greedyConstructor.GetParameters().Select(x => GetArgument(x.ParameterType, buildStack)).ToArray();
+            buildStack.Pop();
             return greedyConstructor.Invoke(parameters);            
         }
 
-        private object GetArgument(Type argumentType)
+        private object GetArgument(Type argumentType, Stack<Type> stack)
         {
             if (argumentType.IsInterface)
             {
@@ -53,7 +60,7 @@ namespace AutoMock
             }
             else
             {
-                return GetInstance(argumentType);
+                return GetInstance(argumentType, stack);
             }
         }
     }

@@ -58,5 +58,11 @@ namespace AutoMock.UnitTests
             // Verify
             Assert.That(instance.WasConstructedUsingGreedyConstructor);
         }
+
+        [Test, ExpectedException(typeof(CircularDependencyException))]
+        public void CircularConstructorDependenciesShouldBeDetected()
+        {
+            var instance = _automocker.GetInstance<ClassWithCircularDependency>();
+        }
     }
 }

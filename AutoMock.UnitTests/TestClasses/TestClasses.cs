@@ -34,4 +34,14 @@
             WasConstructedUsingGreedyConstructor = true;
         }
     }
+
+    public class ClassWithCircularDependency
+    {
+        public ClassWithCircularDependency(ClassWithCircularDependency2 dependency) { }
+    }
+
+    public class ClassWithCircularDependency2
+    {
+        public ClassWithCircularDependency2(ClassWithCircularDependency dependency) { }
+    }
 }
