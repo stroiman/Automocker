@@ -8,44 +8,58 @@ using NUnit.Framework;
 
 namespace AutoMock.UnitTests
 {
-	/// <summary>
-	/// The MoqAutoMocker class integrates all the components for creating a auto mocker
-	/// using Moq as the mocking tool. This test class tests that the integration works
-	/// correctly.
-	/// </summary>
-	[TestFixture]
-	public class MoqAutoMockerIntegrationTests
-	{
-	    private MoqAutoMocker _automocker;
+    /// <summary>
+    /// The MoqAutoMocker class integrates all the components for creating a auto mocker
+    /// using Moq as the mocking tool. This test class tests that the integration works
+    /// correctly.
+    /// </summary>
+    [TestFixture]
+    public class MoqAutoMockerIntegrationTests
+    {
+        private MoqAutoMocker _automocker;
 
-	    [SetUp]
+        [SetUp]
         public void Setup()
         {
             _automocker = new MoqAutoMocker();
         }
 
-	    [Test]
-		public void ClassWithDependencyShouldBeConstructedWithMoq()
-		{
-			// Exercise
-			var instance = _automocker.GetInstance<ClassWithSimpleDependency>();
+        [Test]
+        public void ClassWithDependencyShouldBeConstructedWithMockedDependency()
+        {
+            // Exercise
+            var instance = _automocker.GetInstance<ClassWithSimpleDependency>();
 
-			// Verify
-			var dependencyMock = Mock.Get(instance.Dependency);
-			Assert.That(dependencyMock, Is.Not.Null);
-		}
+            // Verify
+            var dependencyMock = Mock.Get(instance.Dependency);
+            Assert.That(dependencyMock, Is.Not.Null);
+        }
 
         [Test]
         public void CreateInstanceAfterGetMockShouldUseSameMock()
         {
             // Setup
             var mock = _automocker.GetMock<ISimpleDependency>();
- 
+
             // Exercise
             var instance = _automocker.GetInstance<ClassWithSimpleDependency>();
 
             // Verify
             Assert.That(instance.Dependency, Is.SameAs(mock.Object));
         }
-	}
+
+
+        [Test]
+        public void GetMockBeforeCreateInstanceWithNestedDependencyShouldReuseSameMock()
+        {
+            // Setup
+            var mock = _automocker.GetMock<ISimpleDependency>();
+
+            // Exercise
+            var instance = _automocker.GetInstance<ClassWithNestedDependency>();
+
+            // Veridy
+            Assert.That(instance.Dependency.Dependency, Is.SameAs(mock.Object));
+        }
+    }
 }
