@@ -5,7 +5,26 @@ using System.Reflection;
 
 namespace AutoMock
 {
-    public class CircularDependencyException : Exception {}
+    /// <summary>
+    /// This exception is throw when trying to create an instance of a type that has circular
+    /// dependencies to itself.
+    /// </summary>
+    public class CircularDependencyException : Exception
+    {
+        private readonly Type _type;
+
+        public CircularDependencyException(Type type)
+        {
+            _type = type;
+        }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "Error creating an instance of type {0}, as it has circular dependencies to itself\r\n\r\n{1}",
+                _type.Name, base.ToString());
+        }
+    }
 
     /// <summary>
     /// This class responsible for objects to be used in unit tests, but with the dependencies of
@@ -45,6 +64,10 @@ namespace AutoMock
         /// <summary>
         /// Creates an instance of the class <typeparamref name="T"/>.
         /// </summary>
+        /// <exception cref="CircularDependencyException">
+        /// While building an instance of <typeparam name="T"/>, a circular dependency
+        /// was detected, making it impossible to build the instance.
+        /// </exception>
         public T GetInstance<T>()
         {
             return (T)GetInstance(typeof(T), new Stack<Type>());
@@ -53,7 +76,7 @@ namespace AutoMock
         private object GetInstance(Type type, Stack<Type> buildStack)
         {
             if (buildStack.Contains(type))
-                throw new CircularDependencyException();
+                throw new CircularDependencyException(type);
             buildStack.Push(type);
             var constructors = type.GetConstructors();
             var greedyConstructor = constructors.OrderBy(x => x.GetParameters().Count()).Last();

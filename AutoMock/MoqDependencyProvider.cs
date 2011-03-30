@@ -34,14 +34,15 @@ namespace AutoMock
         private Mock<T> GetMock<T>(Stack<Type> buildStack) where T : class
         {
             Mock cachedMock;
-            if (_cache.TryGetValue(typeof(T), out cachedMock))
+            var typeToBuild = typeof(T);
+            if (_cache.TryGetValue(typeToBuild, out cachedMock))
                 return (Mock<T>)cachedMock;
-            if (buildStack.Contains(typeof(T)))
-                throw new CircularDependencyException();
-            buildStack.Push(typeof(T));
+            if (buildStack.Contains(typeToBuild))
+                throw new CircularDependencyException(typeToBuild);
+            buildStack.Push(typeToBuild);
             var mock = new Mock<T>();
             SetupMockGetters(mock, buildStack);
-            _cache.Add(typeof(T), mock);
+            _cache.Add(typeToBuild, mock);
             buildStack.Pop();
             return mock;
         }
