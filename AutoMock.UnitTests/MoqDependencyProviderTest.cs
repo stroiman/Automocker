@@ -7,14 +7,19 @@ namespace AutoMock.UnitTests
     [TestFixture]
     public class MoqDependencyProviderTest
     {
+        private MoqDependencyProvider _repository;
+
+        [SetUp]
+        public void Setup()
+        {
+            _repository = new MoqDependencyProvider();
+        }
+
         [Test]
         public void ResolvingAnInterfaceShouldReturnAMoq()
         {
-            // Setup
-            var repository = new MoqDependencyProvider();
-
             // Exercise
-            var mockedInstance = repository.GetInstance<ISimpleDependency>();
+            var mockedInstance = _repository.GetInstance<ISimpleDependency>();
 
             // Verify
             var mock = Mock.Get(mockedInstance);
