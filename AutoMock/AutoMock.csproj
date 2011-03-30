@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AutoMocker.cs" />
     <Compile Include="IDependencyProvider.cs" />
+    <Compile Include="MoqAutoMocker.cs" />
     <Compile Include="MoqDependencyProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
