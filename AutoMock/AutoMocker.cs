@@ -13,9 +13,20 @@ namespace AutoMock
     /// configure this in unit tests, and manually adjusting tests when dependencies for the
     /// SUT changes.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The automocker will always try to find the greediest constructor, i.e. the constructor
+    /// taking the greates number of parameters.
+    /// </para>
+    /// <para>
+    /// An instance created using the automocker can not take several constructor parameters of
+    /// the same type.
+    /// </para>
+    /// </remarks>
     public class AutoMocker<TDependencyProvider> where TDependencyProvider : IDependencyProvider
     {
         private readonly TDependencyProvider _dependencyProvider;
+        private readonly Dictionary<Type, object> _injectedInstances;
         
         /// <summary>
         /// Creates a new <see cref="AutoMocker{T}"/> instance.
@@ -26,6 +37,7 @@ namespace AutoMock
         public AutoMocker(TDependencyProvider dependencyProvider)
         {
             _dependencyProvider = dependencyProvider;
+            _injectedInstances = new Dictionary<Type, object>();
         }
 
         internal TDependencyProvider DependencyProvider { get { return _dependencyProvider; } }
@@ -52,16 +64,28 @@ namespace AutoMock
 
         private object GetArgument(Type argumentType, Stack<Type> stack)
         {
+            object result;
+            if (_injectedInstances.TryGetValue(argumentType, out result))
+                return result;
             if (argumentType.IsInterface)
             {
                 var getInstanceMethod = typeof (IDependencyProvider).GetMethod("GetInstance");
                 var genericMethod = getInstanceMethod.MakeGenericMethod(argumentType);
                 return genericMethod.Invoke(_dependencyProvider, new object[0]);
             }
-            else
-            {
-                return GetInstance(argumentType, stack);
-            }
+            return GetInstance(argumentType, stack);
+        }
+
+        /// <summary>
+        /// Specifies a concrete instance to be used as argument to the constructor instead
+        /// of generating it manually.
+        /// </summary>
+        /// <typeparam name="T">The data type for the parameter to inject.</typeparam>
+        /// <param name="injectedInstance">The actual value for the parameter.</param>
+        public AutoMocker<TDependencyProvider> Using<T>(T injectedInstance)
+        {
+            _injectedInstances[typeof(T)] = injectedInstance;
+            return this;
         }
     }
 }

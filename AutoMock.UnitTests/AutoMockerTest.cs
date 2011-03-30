@@ -64,5 +64,19 @@ namespace AutoMock.UnitTests
         {
             var instance = _automocker.GetInstance<ClassWithCircularDependency>();
         }
+
+        [Test]
+        public void InjectedInstanceShouldBeUsedInsteadOfAutoMock()
+        {
+            // Setup
+            var injectedInstance = new Mock<ISimpleDependency>().Object;
+
+            // Exercise
+            var instance = _automocker.Using(injectedInstance).GetInstance<ClassWithSimpleDependency>();
+
+            // Verify
+            _dependencyRepositoryMock.Verify(x => x.GetInstance<ISimpleDependency>(), Times.Never());
+            Assert.That(instance.Dependency, Is.SameAs(injectedInstance));
+        }
     }
 }

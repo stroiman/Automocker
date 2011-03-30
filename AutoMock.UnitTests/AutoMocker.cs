@@ -1,4 +1,7 @@
-﻿namespace AutoMock.UnitTests
+﻿using System;
+using AutoMock.UnitTests.TestClasses;
+
+namespace AutoMock.UnitTests
 {
     public class AutoMocker : AutoMocker<IDependencyProvider>
     {
