@@ -9,6 +9,16 @@
         ISimpleDependency Dependency { get; }
     }
 
+    public interface IInterfaceWithCircularDependency
+    {
+        IInterfaceWithCircularDependency2 Dependency { get; }
+    }
+
+    public interface IInterfaceWithCircularDependency2
+    {
+        IInterfaceWithCircularDependency Dependency { get; }
+    }
+
     public class ClassWithoutDependencies { }
 
     public class ClassWithSimpleDependency

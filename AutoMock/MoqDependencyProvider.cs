@@ -28,37 +28,56 @@ namespace AutoMock
         /// </summary>
         public Mock<T> GetMock<T>() where T : class
         {
+            return GetMock<T>(new Stack<Type>());
+        }
+
+        private Mock<T> GetMock<T>(Stack<Type> buildStack) where T : class
+        {
             Mock cachedMock;
             if (_cache.TryGetValue(typeof(T), out cachedMock))
                 return (Mock<T>)cachedMock;
+            if (buildStack.Contains(typeof(T)))
+                throw new CircularDependencyException();
+            buildStack.Push(typeof(T));
             var mock = new Mock<T>();
-            SetupMockGetters(mock);
+            SetupMockGetters(mock, buildStack);
             _cache.Add(typeof(T), mock);
+            buildStack.Pop();
             return mock;
         }
 
-        private void SetupMockGetters<T>(Mock<T> mock) where T : class
+        private void SetupMockGetters<T>(Mock<T> mock, Stack<Type> buildStack) where T : class
         {
             var type = typeof(T);
             foreach (var propertyInfo in type.GetProperties())
             {
                 if (propertyInfo.CanRead && !propertyInfo.CanWrite && propertyInfo.PropertyType.IsInterface)
                 {
-                    SetupMockPropertyGetter(type, propertyInfo, mock);
+                    SetupMockPropertyGetter(type, propertyInfo, mock, buildStack);
                 }
             }
         }
 
-        private void SetupMockPropertyGetter(Type type, PropertyInfo propertyInfo, Mock mock)
+        private void SetupMockPropertyGetter(Type type, PropertyInfo propertyInfo, Mock mock, Stack<Type> buildStack)
         {
             var methodTemplate = GetType().GetMethod("SetupDependency", BindingFlags.Instance | BindingFlags.NonPublic);
             var genericMethod = methodTemplate.MakeGenericMethod(new[] { type, propertyInfo.PropertyType });
-            genericMethod.Invoke(this, new object[] { mock, propertyInfo });
+            try
+            {
+                genericMethod.Invoke(this, new object[] {mock, propertyInfo, buildStack});
+            }
+            catch(TargetInvocationException e)
+            {
+                var innerException = e.InnerException as CircularDependencyException;
+                if (innerException == null)
+                    throw;
+                throw innerException;
+            }
         }
 
         // Resharper cannot see that this method is used becuase it is created using reflection
         // ReSharper disable UnusedMember.Local
-        private void SetupDependency<TMock, TDependency>(Mock<TMock> mock, PropertyInfo propertyInfo) 
+        private void SetupDependency<TMock, TDependency>(Mock<TMock> mock, PropertyInfo propertyInfo, Stack<Type> buildStack) 
             where TMock : class 
             where TDependency : class
         {
@@ -68,7 +87,7 @@ namespace AutoMock
             var getPropertyExpression = Expression.Property(argument, propertyInfo.Name);
             var expression = Expression.Lambda<Func<TMock, TDependency>>(getPropertyExpression, argument);
 
-            var dependency = GetInstance<TDependency>();
+            var dependency = GetMock<TDependency>(buildStack).Object;
             mock.Setup(expression).Returns(dependency);
         }
         // ReSharper restore UnusedMember.Local

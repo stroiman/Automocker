@@ -74,5 +74,11 @@ namespace AutoMock.UnitTests
             // Veridy
             Assert.That(instance.Dependency, Is.SameAs(mock.Object));
         }
+
+        [Test, ExpectedException(typeof(CircularDependencyException))]
+        public void ResolvingInterfaceWithCircularDependencyShouldThrowDependencyReferenceException()
+        {
+            _repository.GetInstance<IInterfaceWithCircularDependency>();
+        }
     }
 }
