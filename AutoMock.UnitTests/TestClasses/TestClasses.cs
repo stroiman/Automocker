@@ -4,6 +4,11 @@
 
     public interface ISimpleDependency2 { }
 
+    public interface IInterfaceWithDependency
+    {
+        ISimpleDependency Dependency { get; }
+    }
+
     public class ClassWithoutDependencies { }
 
     public class ClassWithSimpleDependency
@@ -43,5 +48,12 @@
     public class ClassWithCircularDependency2
     {
         public ClassWithCircularDependency2(ClassWithCircularDependency dependency) { }
+    }
+
+    public class ClassWithNestedDependency
+    {
+        public IInterfaceWithDependency Dependency { get; private set; }
+
+        public ClassWithNestedDependency(IInterfaceWithDependency dependency) { Dependency = dependency; }
     }
 }

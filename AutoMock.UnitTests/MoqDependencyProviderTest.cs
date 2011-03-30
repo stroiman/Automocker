@@ -51,5 +51,28 @@ namespace AutoMock.UnitTests
             // Verify
             Assert.That(mockedInstance, Is.SameAs(mock.Object));
         }
+
+        [Test]
+        public void CreateInstanceWithNestedDependencyShouldAutomaticallyMockDependency()
+        {
+            // Exercise
+            var instance = _repository.GetInstance<IInterfaceWithDependency>();
+
+            // Verify
+            Assert.That(instance.Dependency, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetMockBeforeCreateInstanceWithNestedDependencyShouldReuseSameMock()
+        {
+            // Setup
+            var mock = _repository.GetMock<ISimpleDependency>();
+
+            // Exercise
+            var instance = _repository.GetInstance<IInterfaceWithDependency>();
+
+            // Veridy
+            Assert.That(instance.Dependency, Is.SameAs(mock.Object));
+        }
     }
 }
