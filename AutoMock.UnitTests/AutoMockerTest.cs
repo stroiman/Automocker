@@ -1,4 +1,5 @@
 ﻿using AutoMock.UnitTests.TestClasses;
+using Moq;
 using NUnit.Framework;
 
 namespace AutoMock.UnitTests
@@ -7,11 +8,13 @@ namespace AutoMock.UnitTests
     public class AutoMockerTest
     {
         private AutoMocker _automocker;
+        private Mock<IDependencyRepository> _dependencyRepositoryMock;
 
         [SetUp]
         public void Setup()
         {
-            _automocker = new AutoMocker();
+            _dependencyRepositoryMock = new Mock<IDependencyRepository>();
+            _automocker = new AutoMocker(_dependencyRepositoryMock.Object);
         }
 
         [Test]
@@ -19,6 +22,20 @@ namespace AutoMock.UnitTests
         {
             var instance = _automocker.GetInstance<ClassWithoutDependencies>();
             Assert.That(instance, Is.InstanceOf<ClassWithoutDependencies>());
+        }
+
+        [Test]
+        public void CreateInstanceWithDependencyShouldGetDependencyFromRepository()
+        {
+            // Setup
+            var dependency = new Mock<ISimpleDependency>().Object;
+            _dependencyRepositoryMock.Setup(x => x.GetInstance<ISimpleDependency>()).Returns(dependency);
+
+            // Exercise
+            var instance = _automocker.GetInstance<ClassWithSimpleDependency>();
+
+            // Verify
+            Assert.That(instance.Dependency, Is.SameAs(dependency));
         }
     }
 }

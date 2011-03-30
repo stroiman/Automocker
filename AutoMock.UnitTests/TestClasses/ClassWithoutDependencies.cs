@@ -1,9 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace AutoMock.UnitTests.TestClasses
+﻿namespace AutoMock.UnitTests.TestClasses
 {
+    public interface ISimpleDependency { }
+
     public class ClassWithoutDependencies { }
+
+    public class ClassWithSimpleDependency
+    {
+        public ISimpleDependency Dependency { get; private set; }
+
+        public ClassWithSimpleDependency(ISimpleDependency dependency) { Dependency = dependency; }
+    }
 }
