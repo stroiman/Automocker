@@ -34,5 +34,18 @@ namespace AutoMock.UnitTests
 			var dependencyMock = Mock.Get(instance.Dependency);
 			Assert.That(dependencyMock, Is.Not.Null);
 		}
+
+        [Test]
+        public void CreateInstanceAfterGetMockShouldUseSameMock()
+        {
+            // Setup
+            var mock = _automocker.GetMock<ISimpleDependency>();
+ 
+            // Exercise
+            var instance = _automocker.GetInstance<ClassWithSimpleDependency>();
+
+            // Verify
+            Assert.That(instance.Dependency, Is.SameAs(mock.Object));
+        }
 	}
 }
