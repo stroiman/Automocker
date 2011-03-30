@@ -16,14 +16,19 @@ namespace AutoMock.UnitTests
 	[TestFixture]
 	public class MoqAutoMockerIntegrationTests
 	{
-		[Test]
+	    private MoqAutoMocker _automocker;
+
+	    [SetUp]
+        public void Setup()
+        {
+            _automocker = new MoqAutoMocker();
+        }
+
+	    [Test]
 		public void ClassWithDependencyShouldBeConstructedWithMoq()
 		{
-			// Setup
-			var automocker = new MoqAutoMocker();
-
 			// Exercise
-			var instance = automocker.GetInstance<ClassWithSimpleDependency>();
+			var instance = _automocker.GetInstance<ClassWithSimpleDependency>();
 
 			// Verify
 			var dependencyMock = Mock.Get(instance.Dependency);
