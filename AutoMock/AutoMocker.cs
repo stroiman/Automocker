@@ -100,7 +100,7 @@ namespace AutoMock
 
         /// <summary>
         /// Specifies a concrete instance to be used as argument to the constructor instead
-        /// of generating it manually.
+        /// of generating it automatically.
         /// </summary>
         /// <typeparam name="T">The data type for the parameter to inject.</typeparam>
         /// <param name="injectedInstance">The actual value for the parameter.</param>
