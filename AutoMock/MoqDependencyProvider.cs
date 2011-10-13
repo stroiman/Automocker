@@ -41,13 +41,12 @@ namespace AutoMock
                 throw new CircularDependencyException(typeToBuild);
             buildStack.Push(typeToBuild);
             var mock = new Mock<T>();
-            SetupMockGetters(mock, buildStack);
             _cache.Add(typeToBuild, mock);
             buildStack.Pop();
             return mock;
         }
 
-        private void SetupMockGetters<T>(Mock<T> mock, Stack<Type> buildStack) where T : class
+        public void SetupMockGetters<T>(Mock<T> mock, Stack<Type> buildStack) where T : class
         {
             var type = typeof(T);
             foreach (var propertyInfo in type.GetProperties())

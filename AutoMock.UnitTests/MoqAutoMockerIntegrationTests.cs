@@ -53,9 +53,11 @@ namespace AutoMock.UnitTests
         public void GetMockBeforeCreateInstanceWithNestedDependencyShouldReuseSameMock()
         {
             // Setup
-            var mock = _automocker.GetMock<ISimpleDependency>();
+            var dependentMock = _automocker.GetMock<IInterfaceWithDependency>();
+            var mock = _automocker.GetMock<ISimpleDependency>();            
 
             // Exercise
+            _automocker.MockDependencies(dependentMock);
             var instance = _automocker.GetInstance<ClassWithNestedDependency>();
 
             // Veridy
